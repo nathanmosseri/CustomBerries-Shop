@@ -4,10 +4,16 @@ import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import cookiepic from '../2ChocolateChipCookies.jpeg'
+import { v4 as uuidv4 } from "uuid";
 
 const Products = () => {
 
     const [cookies, setCookies] = useState([])
+    const [cookieOrder, setCookieOrder] = useState({
+        product_id: '',
+        quantity: 0,
+        sess_id: ''
+    })
 
     useEffect(() => {
         fetch('http://localhost:3000/products').then(res => res.json())
@@ -15,6 +21,47 @@ const Products = () => {
             setCookies(data)
         })
     },[])
+
+    const generateSessionId = () => {
+        if(localStorage.getItem('sess_id') == null){
+            const sessionId = uuidv4()
+            localStorage.setItem('sess_id', sessionId)
+            
+            return sessionId
+        }
+    }
+
+    const sess_id = generateSessionId()
+    // console.log(localStorage.getItem('sess_id'))
+
+    const handleChange = (e, pId) => {
+        setCookieOrder({
+            ...cookieOrder,
+            [e.target.name]: e.target.value,
+            product_id: pId,
+            sess_id: localStorage.getItem('sess_id')
+        })
+    }
+    console.log(cookieOrder)
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        fetch('http://localhost:3000/cart_items', {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(cookieOrder)
+        }).then(res => res.json())
+        .then((data) => {
+            console.log(data)
+            setCookieOrder({
+                product_id: '',
+                quantity: 0,
+                sess_id: ''
+            })
+        })
+    }
 
     const cookieCards = cookies.map((cookie) => {
         return (
@@ -33,9 +80,9 @@ const Products = () => {
                         <ListGroup.Item>???</ListGroup.Item>
                     </ListGroup>
                     <Card.Body>
-                        <form>
+                        <form onSubmit={handleSubmit}>
                             <Form.Label>Quantity</Form.Label>
-                            <Form.Control type="number" placeholder={0} min={0} style={{width: '40%'}}/>
+                            <Form.Control name="quantity" type="number" placeholder={0} min={0} style={{width: '40%'}} onChange={(e) => handleChange(e, cookie.id)}/>
                             <Button type="submit">Add to Cart</Button>
                         </form>
                     </Card.Body>

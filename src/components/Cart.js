@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 const Cart = () => {
 
     const [cartData, setCartData] = useState([])
+    const [itemDeleted, setItemDeleted] = useState(false)
 
     const sess_id = localStorage.getItem('sess_id')
 
@@ -12,7 +13,7 @@ const Cart = () => {
         .then((data) => {
             setCartData(data)
         })
-    }, [])
+    }, [itemDeleted])
 
     let total = 0
     cartData.forEach((item) => {
@@ -20,7 +21,11 @@ const Cart = () => {
         total += itemTotal
     })
 
-    
+    const handleDelete = (e, id) => {
+        fetch(`http://localhost:3000/cart_items/${id}`, {
+            method: 'DELETE'
+        }).then(() => setItemDeleted(prev => !prev))
+    }
 
     return (
         <>
@@ -37,6 +42,7 @@ const Cart = () => {
                                 <h1>{item.item.name}</h1>
                                 <p>{item.quantity}</p>
                                 <p>${item.item.price * item.quantity}</p>
+                                <button onClick={(e) => handleDelete(e, item.cart_item)}>Remove from Cart</button>
                                 <h1></h1>
                             </div>
                         )

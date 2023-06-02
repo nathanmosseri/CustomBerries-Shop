@@ -5,8 +5,22 @@ import Header from './components/Header';
 import KosherCertification from './components/KosherCertification';
 import Products from './components/Products';
 import Cart from './components/Cart';
+import { v4 as uuidv4 } from "uuid";
+
 
 function App() {
+
+  const generateSessionId = () => {
+        if(localStorage.getItem('sess_id') == null){
+            const sessionId = uuidv4()
+            localStorage.setItem('sess_id', sessionId)
+            
+            return sessionId
+        }
+    }
+
+  const sess_id = generateSessionId()
+
   return (
     <div className="App">
       <Header/>

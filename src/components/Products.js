@@ -4,7 +4,6 @@ import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import cookiepic from '../2ChocolateChipCookies.jpeg'
-import { v4 as uuidv4 } from "uuid";
 
 const Products = () => {
 
@@ -21,18 +20,6 @@ const Products = () => {
             setCookies(data)
         })
     },[])
-
-    const generateSessionId = () => {
-        if(localStorage.getItem('sess_id') == null){
-            const sessionId = uuidv4()
-            localStorage.setItem('sess_id', sessionId)
-            
-            return sessionId
-        }
-    }
-
-    const sess_id = generateSessionId()
-    // console.log(localStorage.getItem('sess_id'))
 
     const handleChange = (e, pId) => {
         setCookieOrder({
@@ -54,7 +41,6 @@ const Products = () => {
             body: JSON.stringify(cookieOrder)
         }).then(res => res.json())
         .then((data) => {
-            console.log(data)
             setCookieOrder({
                 product_id: '',
                 quantity: 0,
@@ -101,9 +87,7 @@ const Products = () => {
             <br/>
             <h1>Products with 'add to cart' button</h1>
             <CardGroup style={{margin: '10%'}}>
-                {/* <Row xs={1} md={3} className="g-4"> */}
                     {cookieCards}
-                {/* </Row> */}
             </CardGroup>
         </>
     )

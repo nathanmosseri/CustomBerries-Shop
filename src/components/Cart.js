@@ -5,6 +5,7 @@ const Cart = () => {
 
     const [cartData, setCartData] = useState([])
     const [itemDeleted, setItemDeleted] = useState(false)
+    const [cartDeleted, setCartDeleted] = useState(false)
 
     const sess_id = localStorage.getItem('sess_id')
 
@@ -13,18 +14,28 @@ const Cart = () => {
         .then((data) => {
             setCartData(data)
         })
-    }, [itemDeleted])
+    }, [itemDeleted, cartDeleted])
 
     let total = 0
-    cartData.forEach((item) => {
-        let itemTotal = item.item.price * item.quantity
-        total += itemTotal
-    })
+    if(cartData.error){
+        total = 0
+    } else{
+        cartData.forEach((item) => {
+            let itemTotal = item.item.price * item.quantity
+            total += itemTotal
+        })
+    }
 
-    const handleDelete = (e, id) => {
+    const handleDeleteItem = (e, id) => {
         fetch(`http://localhost:3000/cart_items/${id}`, {
             method: 'DELETE'
         }).then(() => setItemDeleted(prev => !prev))
+    }
+
+    const handleDeleteCart = (e, id) => {
+        fetch(`http://localhost:3000/carts/${id}`, {
+            method: 'DELETE'
+        }).then(() => setCartDeleted(prev => !prev))
     }
 
     return (
@@ -42,12 +53,13 @@ const Cart = () => {
                                 <h1>{item.item.name}</h1>
                                 <p>{item.quantity}</p>
                                 <p>${item.item.price * item.quantity}</p>
-                                <button onClick={(e) => handleDelete(e, item.cart_item)}>Remove from Cart</button>
+                                <button onClick={(e) => handleDeleteItem(e, item.cart_item)}>Remove from Cart</button>
                                 <h1></h1>
                             </div>
                         )
                     })}
                     <h1>Total: ${total}</h1>
+                    <button onClick={(e) => handleDeleteCart(e, sess_id)}>Clear Cart</button>
                     </div>
             }
         </>
